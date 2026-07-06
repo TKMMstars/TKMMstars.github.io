@@ -1,1 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>최종화 - 아이리 칸나</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+    <style>
+        /* 칸나 테마의 딥 블루&다크 배경 */
+        body {
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        /* 메인 카드 컨테이너 */
+        .container {
+            max-width: 800px; 
+            width: 100%;
+            text-align: center;
+            background: rgba(30, 41, 59, 0.4);
+            padding: 40px; 
+            border-radius: 24px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            box-sizing: border-box;
+        }
+
+        /* 재생 버튼 컨테이너 */
+        #ui-control {
+            transition: opacity 0.5s ease;
+            margin-bottom: 30px; 
+        }
+
+        .play-btn {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 16px 40px; 
+            font-size: 1.1rem; 
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(37, 99, 235, 0.6);
+        }
+
+        /* 📝 내가 적은 글을 보여주는 읽기 전용 상자 */
+        .message-display {
+            width: 100%;
+            min-height: 350px; 
+            max-height: 500px; 
+            overflow-y: auto; 
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            border-radius: 12px;
+            color: #cbd5e1;
+            padding: 30px; 
+            font-size: 1.2rem; 
+            line-height: 2.0; 
+            box-sizing: border-box;
+            text-align: left;      
+            white-space: pre-wrap; 
+            margin-bottom: 40px;
+        }
+
+        /* 💬 댓글 섹션 스타일 */
+        .comment-section {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+            text-align: left;
+        }
+
+        .comment-section h3 {
+            font-size: 1.2rem;
+            color: #93c5fd;
+            margin-bottom: 15px;
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .comment-input {
+            flex: 1;
+            background-color: rgba(15, 23, 42, 0.8);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #fff;
+            padding: 12px 16px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .comment-input:focus {
+            border-color: #3b82f6;
+        }
+
+        .comment-submit {
+            background-color: #1e293b;
+            color: #93c5fd;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            padding: 0 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .comment-submit:not(:disabled):hover {
+            background-color: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        /* 🔒 관리자 전용 댓글 리스트 Wrapper */
+        .comment-list-wrapper {
+            display: none; 
+            margin-top: 20px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+        }
+
+        .comment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .comment-item {
+            background-color: rgba(30, 41, 59, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .comment-author {
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: bold;
+        }
+
+        /* ❌ 삭제 버튼 스타일 */
+        .comment-delete-btn {
+            background: none;
+            border: none;
+            color: #f43f5e;
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .comment-delete-btn:hover {
+            background: rgba(244, 63, 94, 0.15);
+        }
+
+        .comment-text {
+            font-size: 0.95rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+        }
+
+        /* 관리자 진입 버튼 스타일 */
+        .admin-toggle-wrapper {
+            text-align: right;
+            margin-top: 15px;
+        }
+
+        .admin-toggle-btn {
+            background: none;
+            border: none;
+            color: #475569;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .admin-toggle-btn:hover {
+            color: #93c5fd;
+        }
+
+        /* 스크롤바 디자인 */
+        .message-display::-webkit-scrollbar,
+        .comment-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .message-display::-webkit-scrollbar-thumb,
+        .comment-list::-webkit-scrollbar-thumb {
+            background-color: #3b82f6;
+            border-radius: 4px;
+        }
+
+        /* 유튜브 플레이어 화면 숨김 처리 */
+        .hidden-player {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="ui-control">
+            <button id="start-bgm" class="play-btn">🎵 편지 읽기 (노래 재생)</button>
+        </div>
+
+        <div class="message-display">안녕하세요, 이 페이지에 머물러주셔서 감사합니다.
+
+테스트 사이트.</div>
+  
 
