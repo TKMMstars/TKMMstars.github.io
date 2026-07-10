@@ -2,18 +2,158 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>3D 웹 공포 방탈출</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>최종화 - 아이리 칸나</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: black; color: white; font-family: sans-serif; }
-        canvas { display: block; }
-        #ui { position: absolute; top: 50%; width: 100%; text-align: center; pointer-events: none; }
-        #instruction { position: absolute; top: 10px; width: 100%; text-align: center; pointer-events: none; }
+        /* 칸나 테마의 딥 블루&다크 배경 */
+        body {
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* 메인 카드 컨테이너 - 크기를 더 크게 수정 */
+        .container {
+            max-width: 800px; /* 550px에서 800px로 확대 */
+            width: 100%;
+            text-align: center;
+            background: rgba(30, 41, 59, 0.4);
+            padding: 30px 40px; /* 패딩 조정 */
+            border-radius: 24px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+
+        /* 📝 내가 적은 글을 보여주는 읽기 전용 상자 - 크기 및 글자 키우기 */
+        .message-display {
+            width: 100%;
+            min-height: 400px; /* 200px에서 400px로 확대 */
+            max-height: 600px; /* 350px에서 600px로 확대 */
+            overflow-y: auto; /* 내용이 길어지면 스크롤 바 생성 */
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            border-radius: 12px;
+            color: #cbd5e1;
+            padding: 30px; /* 패딩 확대 */
+            font-size: 1.2rem; /* 1.05rem에서 1.2rem으로 확대 */
+            line-height: 2.0; /* 줄 간격 확대 */
+            box-sizing: border-box;
+            margin-bottom: 30px; /* 마진 확대 */
+            text-align: left;      /* 글씨는 왼쪽 정렬로 읽기 편하게 */
+            white-space: pre-wrap; /* 코드 창에서 엔터(줄바꿈) 친 대로 화면에 표시됨 */
+        }
+
+        /* 스크롤바 디자인 (딥블루 테마) */
+        .message-display::-webkit-scrollbar {
+            width: 6px;
+        }
+        .message-display::-webkit-scrollbar-thumb {
+            background-color: #3b82f6;
+            border-radius: 4px;
+        }
+
+        /* 재생 버튼 스타일 */
+        #ui-control {
+            transition: opacity 0.5s ease;
+        }
+
+        .play-btn {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 16px 40px; /* 패딩 확대 */
+            font-size: 1.1rem; /* 1.05rem에서 1.1rem으로 확대 */
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(37, 99, 235, 0.6);
+        }
+
+        /* 유튜브 플레이어 화면 숨김 처리 */
+        .hidden-player {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+        }
     </style>
 </head>
 <body>
-    <div id="instruction">화면을 클릭하면 게임이 시작됩니다. (ESC로 마우스 잠금 해제)</div>
-    <div id="ui">+</div> <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
-    <script src="game.js"></script>
+
+    <div class="container">
+        <div class="message-display">안녕하세요, 이 페이지에 머물러주셔서 감사합니다.
+
+이곳은 제가 직접 작성한 글을 읽는 공간입니다.
+아래 버튼을 누르면 아이리 칸나의 '최종화'가 배경음악으로 흐르며,
+음악을 트는 순간 이 버튼은 깔끔하게 사라지게 됩니다.
+
+여기에 당신의 소중한 이야기나 전하고 싶은 말을 채워보세요.
+
+(UI 크기가 더 커지고 제목이 사라진 새로운 버전입니다.)</div>
+
+        <div id="ui-control">
+            <button id="start-bgm" class="play-btn">🎵 편지 읽기 (노래 재생)</button>
+        </div>
+    </div>
+
+    <div id="yt-player" class="hidden-player"></div>
+
+    <script>
+        // 보내주신 유튜브 링크의 비디오 ID가 정상 적용되었습니다.
+        var kannaVideoId = 'ajDAmJYPQ-U'; 
+
+        // 1. YouTube Iframe API 로드
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('yt-player', {
+                videoId: kannaVideoId,
+                playerVars: {
+                    'autoplay': 0,      // 브라우저 정책 우회를 위해 처음엔 정지 상태로 대기
+                    'controls': 0,      // 유튜브 컨트롤바 숨김
+                    'loop': 1,          // 반복 재생 활성화
+                    'playlist': kannaVideoId // 무한 루프 구현용 동일 ID 지정
+                },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            // 버튼 클릭 이벤트 리스너 등록
+            document.getElementById('start-bgm').addEventListener('click', function() {
+                player.unMute();    // 음소거 해제
+                player.playVideo(); // 영상 재생 시작
+                
+                // 버튼 UI를 부드럽게 사라지게 한 뒤 공간 삭제 (0.5초)
+                var ui = document.getElementById('ui-control');
+                ui.style.opacity = '0';
+                setTimeout(function() {
+                    ui.style.display = 'none';
+                }, 500); 
+            });
+        }
+    </script>
 </body>
 </html>
