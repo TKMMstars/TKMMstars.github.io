@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>최종화 - 아이리 칸나</title>
     
+    <!-- 🔥 파이어베이스 라이브러리 로드 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -78,15 +79,21 @@
             margin-bottom: 40px;
         }
 
+        /* 💬 분리된 구역(섹션)들의 기본 스타일 */
         .comment-section {
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-top: 30px;
+            margin-bottom: 20px;
             text-align: left;
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 12px;
+            padding: 25px;
         }
 
         .comment-section h3 {
             font-size: 1.2rem;
             color: #93c5fd;
+            margin-top: 0;
             margin-bottom: 15px;
         }
 
@@ -141,7 +148,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            max-height: 300px;
+            max-height: 250px;
             overflow-y: auto;
         }
 
@@ -189,7 +196,9 @@
 
         .admin-toggle-wrapper {
             text-align: right;
-            margin-top: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .admin-toggle-btn {
@@ -207,21 +216,14 @@
 
         /* 스크롤바 디자인 */
         .message-display::-webkit-scrollbar,
-        .comment-list::-webkit-scrollbar {
-            width: 6px;
-        }
+        .comment-list::-webkit-scrollbar { width: 6px; }
         .message-display::-webkit-scrollbar-thumb,
-        .comment-list::-webkit-scrollbar-thumb {
-            background-color: #3b82f6;
-            border-radius: 4px;
-        }
+        .comment-list::-webkit-scrollbar-thumb { background-color: #3b82f6; border-radius: 4px; }
 
         .hidden-player {
             position: absolute;
-            top: -9999px;
-            left: -9999px;
-            width: 1px;
-            height: 1px;
+            top: -9999px; left: -9999px;
+            width: 1px; height: 1px;
         }
     </style>
 </head>
@@ -238,24 +240,38 @@
 상단의 버튼을 누르면 아이리 칸나의 '최종화'가 배경음악으로 흐르며,
 음악을 트는 순간 버튼은 깔끔하게 사라지게 됩니다.
 
-아래 방명록에 남겨주신 글은 관리자 외에는 볼 수 없으니 편하게 남겨주세요.</div>
+아래 여러 구역에 남겨주신 글은 관리자 외에는 볼 수 없으니 편하게 남겨주세요.</div>
 
+        <!-- 📌 첫 번째 구역 (A) -->
         <div class="comment-section">
-            <h3>방명록 (익명 댓글)</h3>
+            <h3>📝 첫 번째 방명록 (자유 공간)</h3>
             <div class="comment-form">
-                <input type="text" id="comment-text" class="comment-input" placeholder="익명으로 따뜻한 한마디를 남겨보세요..." maxlength="200">
-                <button id="submit-btn" class="comment-submit">등록</button>
+                <input type="text" id="comment-text-A" class="comment-input" placeholder="이곳에 첫 번째 주제의 글을 남겨주세요..." maxlength="200">
+                <button id="submit-btn-A" class="comment-submit" onclick="submitComment('A', 'comments_A')">등록</button>
             </div>
-            
-            <div id="admin-list-wrapper" class="comment-list-wrapper">
-                <h4 style="color: #f43f5e; margin-bottom: 10px;">🔒 관리자 뷰어 활성화됨</h4>
-                <div id="comment-list" class="comment-list"></div>
+            <div id="admin-list-wrapper-A" class="comment-list-wrapper">
+                <h4 style="color: #f43f5e; margin-bottom: 10px;">🔒 첫 번째 방명록 (관리자 뷰어)</h4>
+                <div id="comment-list-A" class="comment-list"></div>
             </div>
+        </div>
 
-            <div class="admin-toggle-wrapper">
-                <button id="admin-login-btn" class="admin-toggle-btn">🔒 관리자 모드</button>
-                <button id="admin-logout-btn" class="admin-toggle-btn" style="display: none; color: #f43f5e;">🔓 로그아웃</button>
+        <!-- 📌 두 번째 구역 (B) -->
+        <div class="comment-section">
+            <h3>💌 두 번째 방명록 (특별한 질문)</h3>
+            <div class="comment-form">
+                <input type="text" id="comment-text-B" class="comment-input" placeholder="이곳에는 다른 주제나 질문을 남겨주세요..." maxlength="200">
+                <button id="submit-btn-B" class="comment-submit" onclick="submitComment('B', 'comments_B')">등록</button>
             </div>
+            <div id="admin-list-wrapper-B" class="comment-list-wrapper">
+                <h4 style="color: #f43f5e; margin-bottom: 10px;">🔒 두 번째 방명록 (관리자 뷰어)</h4>
+                <div id="comment-list-B" class="comment-list"></div>
+            </div>
+        </div>
+
+        <!-- 공통 관리자 모드 버튼 -->
+        <div class="admin-toggle-wrapper">
+            <button id="admin-login-btn" class="admin-toggle-btn">🔒 관리자 로그인</button>
+            <button id="admin-logout-btn" class="admin-toggle-btn" style="display: none; color: #f43f5e;">🔓 로그아웃</button>
         </div>
     </div>
 
@@ -296,35 +312,43 @@
             projectId: "website-32a82",
             storageBucket: "website-32a82.firebasestorage.app",
             messagingSenderId: "51412253738",
-            appId: "1:51412253738:web:018218156cc35b11869753",
-            measurementId: "G-M6ND09X25Q"
+            appId: "1:51412253738:web:018218156cc35b11869753"
         };
         
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const auth = firebase.auth(); 
 
-        // 3. 🛠️ [버그 수정] 로그인 상태 실시간 감지
+        // 3. 🛠️ 로그인 상태 감지 (다중 구역 동시 컨트롤)
         auth.onAuthStateChanged(function(user) {
             if (user) {
-                // 로그인 되어있다면 UI를 바로 관리자 모드로 변경
-                document.getElementById('admin-list-wrapper').style.display = 'block';
+                // 구역 A, B의 관리자 화면 모두 열기
+                document.getElementById('admin-list-wrapper-A').style.display = 'block';
+                document.getElementById('admin-list-wrapper-B').style.display = 'block';
+                
                 document.getElementById('admin-login-btn').style.display = 'none';
                 document.getElementById('admin-logout-btn').style.display = 'inline-block';
                 
-                // 데이터 중복 로드를 막기 위해 리스트 초기화 후 새로 불러오기
-                document.getElementById('comment-list').innerHTML = ''; 
-                loadCommentsRealtime();
+                // 리스트 초기화 후 새로 불러오기
+                document.getElementById('comment-list-A').innerHTML = ''; 
+                document.getElementById('comment-list-B').innerHTML = ''; 
+                
+                loadCommentsRealtime('A', 'comments_A');
+                loadCommentsRealtime('B', 'comments_B');
             } else {
-                // 로그아웃 상태라면 관리자 모드 숨기기
-                document.getElementById('admin-list-wrapper').style.display = 'none';
+                // 로그아웃 시 모두 숨기기
+                document.getElementById('admin-list-wrapper-A').style.display = 'none';
+                document.getElementById('admin-list-wrapper-B').style.display = 'none';
+                
                 document.getElementById('admin-login-btn').style.display = 'inline-block';
                 document.getElementById('admin-logout-btn').style.display = 'none';
-                document.getElementById('comment-list').innerHTML = ''; 
+                
+                document.getElementById('comment-list-A').innerHTML = ''; 
+                document.getElementById('comment-list-B').innerHTML = ''; 
             }
         });
 
-        // 4. 🔐 관리자 로그인 & 로그아웃 기능
+        // 4. 🔐 로그인 & 로그아웃 버튼 이벤트
         document.getElementById('admin-login-btn').addEventListener('click', function() {
             var email = prompt("관리자 이메일을 입력하세요:");
             if (!email) return;
@@ -332,10 +356,6 @@
             if (!password) return;
 
             auth.signInWithEmailAndPassword(email, password)
-            .then(function() {
-                alert("인증 성공!");
-                // UI 변경은 onAuthStateChanged가 자동으로 처리해줍니다.
-            })
             .catch(function(error) {
                 alert("로그인 실패: 이메일 또는 비밀번호가 올바르지 않습니다.");
             });
@@ -349,56 +369,56 @@
             }
         });
 
-        // 5. 🔄 실시간 데이터 로드
-        function loadCommentsRealtime() {
-            database.ref('comments').orderByChild('timestamp').on('child_added', function(snapshot) {
+        // 5. 🔄 실시간 데이터 로드 (모듈화: A, B 모두 사용 가능)
+        function loadCommentsRealtime(sectionCode, dbPath) {
+            database.ref(dbPath).orderByChild('timestamp').on('child_added', function(snapshot) {
                 const commentId = snapshot.key;
                 const data = snapshot.val();
                 
                 var newComment = document.createElement('div');
                 newComment.className = 'comment-item';
-                newComment.id = 'comment-' + commentId; 
+                newComment.id = 'comment-' + sectionCode + '-' + commentId; 
                 
                 const date = new Date(data.timestamp).toLocaleString('ko-KR', { hour12: true, month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
                 const safeText = data.text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
                 newComment.innerHTML = `
                     <div class="comment-header">
-                        <div class="comment-author">익명의 방문자 · ${date}</div>
-                        <button class="comment-delete-btn" onclick="deleteComment('${commentId}')">❌ 삭제</button>
+                        <div class="comment-author">익명 · ${date}</div>
+                        <button class="comment-delete-btn" onclick="deleteComment('${dbPath}', '${commentId}', '${sectionCode}')">❌ 삭제</button>
                     </div>
                     <div class="comment-text">${safeText}</div>
                 `;
                 
-                var list = document.getElementById('comment-list');
+                var list = document.getElementById('comment-list-' + sectionCode);
                 list.insertBefore(newComment, list.firstChild); 
             });
 
-            database.ref('comments').on('child_removed', function(snapshot) {
+            database.ref(dbPath).on('child_removed', function(snapshot) {
                 const commentId = snapshot.key;
-                const targetElement = document.getElementById('comment-' + commentId);
+                const targetElement = document.getElementById('comment-' + sectionCode + '-' + commentId);
                 if (targetElement) {
                     targetElement.remove();
                 }
             });
         }
 
-        // 6. ❌ 댓글 삭제
-        function deleteComment(commentId) {
+        // 6. ❌ 댓글 삭제 (어떤 구역의 댓글인지 dbPath로 구분)
+        function deleteComment(dbPath, commentId, sectionCode) {
             if (!auth.currentUser) {
                 alert("권한이 없습니다.");
                 return;
             }
             if (confirm("이 댓글을 영구 삭제하시겠습니까?")) {
-                database.ref('comments').child(commentId).remove()
+                database.ref(dbPath).child(commentId).remove()
                 .catch(function(error) { alert("삭제 실패: " + error.message); });
             }
         }
 
-        // 7. 💬 엔터키 & 버튼 전송 로직
-        function submitComment() {
-            var input = document.getElementById('comment-text');
-            var button = document.getElementById('submit-btn');
+        // 7. 💬 댓글 전송 및 엔터키 이벤트 (A, B 구역 자동 매핑)
+        function submitComment(sectionCode, dbPath) {
+            var input = document.getElementById('comment-text-' + sectionCode);
+            var button = document.getElementById('submit-btn-' + sectionCode);
             var text = input.value.trim();
             
             if(text === "") {
@@ -406,7 +426,7 @@
                 return;
             }
 
-            database.ref('comments').push({
+            database.ref(dbPath).push({
                 text: text,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             }, function(error) {
@@ -431,13 +451,15 @@
             });
         }
 
-        document.getElementById('submit-btn').addEventListener('click', submitComment);
-
-        document.getElementById('comment-text').addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault(); 
-                submitComment();
-            }
+        // 각 입력창에 엔터키 리스너 연결
+        ['A', 'B'].forEach(function(sectionCode) {
+            const dbPath = 'comments_' + sectionCode;
+            document.getElementById('comment-text-' + sectionCode).addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); 
+                    submitComment(sectionCode, dbPath);
+                }
+            });
         });
     </script>
 </body>
