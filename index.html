@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>최종화 - 아이리 칸나</title>
+    <title>해야함</title>
     
-    <!-- 🔥 파이어베이스 라이브러리 로드 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
     <style>
-        /* 부드러운 스크롤 이동 효과 */
         html { scroll-behavior: smooth; }
 
         body {
@@ -28,7 +26,6 @@
             position: relative;
         }
 
-        /* 🧭 좌측 퀵 내비게이션 (바로가기) */
         .side-nav {
             position: fixed;
             left: 30px;
@@ -36,7 +33,7 @@
             transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             z-index: 100;
         }
 
@@ -45,10 +42,11 @@
             color: #94a3b8;
             background: rgba(30, 41, 59, 0.6);
             border: 1px solid rgba(148, 163, 184, 0.2);
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: 12px;
             backdrop-filter: blur(8px);
             font-weight: bold;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             text-align: center;
@@ -98,15 +96,15 @@
             box-shadow: 0 6px 24px rgba(37, 99, 235, 0.6);
         }
 
-        /* 📖 각 이야기(섹션) 묶음 */
+        /* 각 이야기(섹션) 묶음 */
         .story-section {
-            scroll-margin-top: 60px; /* 클릭해서 이동 시 위쪽 여백 확보 */
+            scroll-margin-top: 60px;
             margin-bottom: 60px;
         }
 
         .section-title {
             color: #cbd5e1;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             margin-bottom: 15px;
             text-align: left;
             border-bottom: 2px solid rgba(147, 197, 253, 0.2);
@@ -115,7 +113,7 @@
 
         .message-display {
             width: 100%;
-            min-height: 200px; /* 글이 짧을 때를 대비해 기본 높이 축소 */
+            min-height: 150px; 
             max-height: 500px; 
             overflow-y: auto; 
             background-color: rgba(15, 23, 42, 0.6);
@@ -131,7 +129,7 @@
             margin-bottom: 20px;
         }
 
-        /* 💬 방명록 스타일 */
+        /* 방명록 스타일 */
         .comment-section {
             text-align: left;
             background: rgba(15, 23, 42, 0.3);
@@ -141,7 +139,7 @@
         }
 
         .comment-section h3 {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             color: #93c5fd;
             margin-top: 0;
             margin-bottom: 15px;
@@ -221,21 +219,14 @@
         }
 
         .comment-delete-btn {
-            background: none;
-            border: none;
-            color: #f43f5e;
-            font-size: 0.8rem;
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 4px;
+            background: none; border: none; color: #f43f5e;
+            font-size: 0.8rem; cursor: pointer; padding: 2px 6px; border-radius: 4px;
         }
 
         .comment-text { font-size: 0.95rem; color: #e2e8f0; line-height: 1.5; }
 
         .admin-toggle-wrapper {
-            text-align: right;
-            margin-top: 10px;
-            padding-top: 20px;
+            text-align: right; margin-top: 10px; padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -253,21 +244,23 @@
             position: absolute; top: -9999px; left: -9999px; width: 1px; height: 1px;
         }
 
-        /* 모바일 등 작은 화면에서는 바로가기 버튼을 위쪽으로 가로 배치 */
+        /* 모바일 등 작은 화면 최적화 (버튼 5개가 자연스럽게 줄바꿈 되도록 설정) */
         @media (max-width: 1024px) {
             .side-nav {
                 position: static;
                 transform: none;
                 flex-direction: row;
+                flex-wrap: wrap; /* 공간이 부족하면 밑줄로 내려감 */
                 justify-content: center;
                 margin-bottom: 30px;
                 width: 100%;
+                gap: 8px;
             }
             .nav-link {
-                flex: 1;
-                max-width: 150px;
-                padding: 10px;
-                font-size: 0.9rem;
+                flex: 1 1 calc(33% - 10px); /* 모바일에서는 3개, 2개씩 정렬 */
+                max-width: 140px;
+                padding: 8px;
+                font-size: 0.85rem;
             }
             .nav-link:hover { transform: translateY(-2px); }
         }
@@ -275,57 +268,112 @@
 </head>
 <body>
 
-    <!-- 🧭 좌측 퀵 내비게이션 -->
+    <!--  좌측 퀵 내비게이션 (5개로 확장) -->
     <div class="side-nav">
-        <a href="#section-A" class="nav-link">📝 첫 번째 글</a>
-        <a href="#section-B" class="nav-link">💌 두 번째 글</a>
+        <a href="#section-A" class="nav-link"> 첫 번째 글</a>
+        <a href="#section-B" class="nav-link"> 두 번째 글</a>
+        <a href="#section-C" class="nav-link"> 세 번째 글</a>
+        <a href="#section-D" class="nav-link"> 네 번째 글</a>
+        <a href="#section-E" class="nav-link"> 다섯 번째 글</a>
     </div>
 
     <div class="container">
         <div id="ui-control">
-            <button id="start-bgm" class="play-btn">🎵 편지 읽기 (노래 재생)</button>
+            <button id="start-bgm" class="play-btn">노래 재생</button>
         </div>
 
-        <!-- 📌 첫 번째 이야기 & 방명록 (A) -->
+        <!-- 첫 번째 이야기 (A) -->
         <div id="section-A" class="story-section">
             <h2 class="section-title">✨ 첫 번째 이야기</h2>
-            <div class="message-display">안녕하세요, 이 페이지에 머물러주셔서 감사합니다.
-
-이곳은 제가 첫 번째로 전하고 싶은 메시지를 적는 공간입니다.
-여기에 장문의 편지나 이야기를 마음껏 작성해 보세요.
-원하시는 만큼 글을 채워 넣으시면 됩니다.</div>
+            <div class="message-display">안녕하세요, 첫 번째 공간입니다.
+여기에 첫 번째로 전하고 싶은 메시지를 적어주세요.
+            테스트 메세지
             
+            
+            
+            
+테스트 메세지</div>
             <div class="comment-section">
-                <h3>위 글에 대한 방명록 남기기</h3>
+                <h3>댓글</h3>
                 <div class="comment-form">
-                    <input type="text" id="comment-text-A" class="comment-input" placeholder="첫 번째 글에 대한 소감을 남겨주세요..." maxlength="200">
+                    <input type="text" id="comment-text-A" class="comment-input" placeholder="....." maxlength="200">
                     <button id="submit-btn-A" class="comment-submit" onclick="submitComment('A', 'comments_A')">등록</button>
                 </div>
                 <div id="admin-list-wrapper-A" class="comment-list-wrapper">
-                    <h4 style="color: #f43f5e; margin-bottom: 10px;">🔒 첫 번째 글 방명록 (관리자 뷰어)</h4>
+                    <h4 style="color: #f43f5e; margin-bottom: 10px;">🔒관리자 뷰어</h4>
                     <div id="comment-list-A" class="comment-list"></div>
                 </div>
             </div>
         </div>
 
-        <!-- 📌 두 번째 이야기 & 방명록 (B) -->
+        <!-- 📌 두 번째 이야기 (B) -->
         <div id="section-B" class="story-section">
             <h2 class="section-title">✨ 두 번째 이야기</h2>
-            <div class="message-display">이곳은 두 번째 주제나 또 다른 편지를 적는 완전히 독립된 공간입니다.
-
-위의 첫 번째 글과는 다른 새로운 질문, 혹은 방문자분들께 
-따로 전하고 싶은 특별한 메시지가 있다면 여기에 적어주세요.
-각 글에 맞는 댓글이 따로따로 저장됩니다.</div>
-            
+            <div class="message-display">두 번째 공간입니다.
+새로운 질문이나 편지를 적어보세요.</div>
             <div class="comment-section">
-                <h3>위 글에 대한 방명록 남기기</h3>
+                <h3>방명록 남기기</h3>
                 <div class="comment-form">
-                    <input type="text" id="comment-text-B" class="comment-input" placeholder="두 번째 글에 대한 답변이나 소감을 남겨주세요..." maxlength="200">
+                    <input type="text" id="comment-text-B" class="comment-input" placeholder="두 번째 글에 대한 소감..." maxlength="200">
                     <button id="submit-btn-B" class="comment-submit" onclick="submitComment('B', 'comments_B')">등록</button>
                 </div>
                 <div id="admin-list-wrapper-B" class="comment-list-wrapper">
-                    <h4 style="color: #f43f5e; margin-bottom: 10px;">🔒 두 번째 글 방명록 (관리자 뷰어)</h4>
+                    <h4 style="color: #f43f5e; margin-bottom: 10px;">🔒 두 번째 글 관리자 뷰어</h4>
                     <div id="comment-list-B" class="comment-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📌 세 번째 이야기 (C) -->
+        <div id="section-C" class="story-section">
+            <h2 class="section-title">✨ 세 번째 이야기</h2>
+            <div class="message-display">세 번째 공간입니다.
+원하시는 내용을 자유롭게 작성하세요.</div>
+            <div class="comment-section">
+                <h3>방명록 남기기</h3>
+                <div class="comment-form">
+                    <input type="text" id="comment-text-C" class="comment-input" placeholder="세 번째 글에 대한 소감..." maxlength="200">
+                    <button id="submit-btn-C" class="comment-submit" onclick="submitComment('C', 'comments_C')">등록</button>
+                </div>
+                <div id="admin-list-wrapper-C" class="comment-list-wrapper">
+                    <h4 style="color: #f43f5e; margin-bottom: 10px;">🔒 세 번째 글 관리자 뷰어</h4>
+                    <div id="comment-list-C" class="comment-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📌 네 번째 이야기 (D) -->
+        <div id="section-D" class="story-section">
+            <h2 class="section-title">✨ 네 번째 이야기</h2>
+            <div class="message-display">네 번째 공간입니다.
+방문자들에게 묻고 싶은 질문을 적어보는 건 어떨까요?</div>
+            <div class="comment-section">
+                <h3>방명록 남기기</h3>
+                <div class="comment-form">
+                    <input type="text" id="comment-text-D" class="comment-input" placeholder="네 번째 글에 대한 소감..." maxlength="200">
+                    <button id="submit-btn-D" class="comment-submit" onclick="submitComment('D', 'comments_D')">등록</button>
+                </div>
+                <div id="admin-list-wrapper-D" class="comment-list-wrapper">
+                    <h4 style="color: #f43f5e; margin-bottom: 10px;">🔒 네 번째 글 관리자 뷰어</h4>
+                    <div id="comment-list-D" class="comment-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📌 다섯 번째 이야기 (E) -->
+        <div id="section-E" class="story-section">
+            <h2 class="section-title">✨ 다섯 번째 이야기</h2>
+            <div class="message-display">마지막 다섯 번째 공간입니다.
+마무리 인사나 남기고 싶은 말을 자유롭게 채워보세요.</div>
+            <div class="comment-section">
+                <h3>방명록 남기기</h3>
+                <div class="comment-form">
+                    <input type="text" id="comment-text-E" class="comment-input" placeholder="다섯 번째 글에 대한 소감..." maxlength="200">
+                    <button id="submit-btn-E" class="comment-submit" onclick="submitComment('E', 'comments_E')">등록</button>
+                </div>
+                <div id="admin-list-wrapper-E" class="comment-list-wrapper">
+                    <h4 style="color: #f43f5e; margin-bottom: 10px;">🔒 다섯 번째 글 관리자 뷰어</h4>
+                    <div id="comment-list-E" class="comment-list"></div>
                 </div>
             </div>
         </div>
@@ -366,7 +414,7 @@
             });
         }
 
-        // 2. 🔥 파이어베이스 설정 (기존 정보 유지)
+        // 2. 🔥 파이어베이스 설정
         const firebaseConfig = {
             apiKey: "AIzaSyBKmo57nKqIpRQvoPOUFtYHXZE2IpcHzbY",
             authDomain: "website-32a82.firebaseapp.com",
@@ -381,31 +429,34 @@
         const database = firebase.database();
         const auth = firebase.auth(); 
 
-        // 3. 🛠️ 로그인 상태 감지 (다중 구역 동시 컨트롤)
+        // 관리할 전체 구역 리스트 (A ~ E)
+        const allSections = ['A', 'B', 'C', 'D', 'E'];
+
+        // 3. 🛠️ 로그인 상태 감지 (5개 구역 동시 반복문 처리)
         auth.onAuthStateChanged(function(user) {
             if (user) {
-                document.getElementById('admin-list-wrapper-A').style.display = 'block';
-                document.getElementById('admin-list-wrapper-B').style.display = 'block';
                 document.getElementById('admin-login-btn').style.display = 'none';
                 document.getElementById('admin-logout-btn').style.display = 'inline-block';
                 
-                document.getElementById('comment-list-A').innerHTML = ''; 
-                document.getElementById('comment-list-B').innerHTML = ''; 
-                
-                loadCommentsRealtime('A', 'comments_A');
-                loadCommentsRealtime('B', 'comments_B');
+                // 로그인 시 5개 구역 모두 열고 데이터 불러오기
+                allSections.forEach(function(section) {
+                    document.getElementById('admin-list-wrapper-' + section).style.display = 'block';
+                    document.getElementById('comment-list-' + section).innerHTML = ''; 
+                    loadCommentsRealtime(section, 'comments_' + section);
+                });
             } else {
-                document.getElementById('admin-list-wrapper-A').style.display = 'none';
-                document.getElementById('admin-list-wrapper-B').style.display = 'none';
                 document.getElementById('admin-login-btn').style.display = 'inline-block';
                 document.getElementById('admin-logout-btn').style.display = 'none';
                 
-                document.getElementById('comment-list-A').innerHTML = ''; 
-                document.getElementById('comment-list-B').innerHTML = ''; 
+                // 로그아웃 시 5개 구역 모두 숨기기
+                allSections.forEach(function(section) {
+                    document.getElementById('admin-list-wrapper-' + section).style.display = 'none';
+                    document.getElementById('comment-list-' + section).innerHTML = ''; 
+                });
             }
         });
 
-        // 4. 🔐 로그인 & 로그아웃 버튼 이벤트
+        // 4. 🔐 로그인 & 로그아웃 버튼
         document.getElementById('admin-login-btn').addEventListener('click', function() {
             var email = prompt("관리자 이메일을 입력하세요:");
             if (!email) return;
@@ -419,7 +470,7 @@
         });
 
         document.getElementById('admin-logout-btn').addEventListener('click', function() {
-            if (confirm("관리자 모드에서 로그아웃 하시겠습니까?")) {
+            if (confirm("전체 관리자 모드에서 로그아웃 하시겠습니까?")) {
                 auth.signOut().then(function() {
                     alert("안전하게 로그아웃 되었습니다.");
                 });
@@ -508,8 +559,8 @@
             });
         }
 
-        // 각 입력창에 엔터키 연결
-        ['A', 'B'].forEach(function(sectionCode) {
+        // 5개 입력창 모두에 엔터키 이벤트 자동 연결
+        allSections.forEach(function(sectionCode) {
             const dbPath = 'comments_' + sectionCode;
             document.getElementById('comment-text-' + sectionCode).addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
